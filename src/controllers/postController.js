@@ -39,13 +39,68 @@ module.exports.createPost = async (req, res) => {
 module.exports.getPosts = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id });
-        const posts = await Post.find({
-            user: [...user.following, user._id, "6313c3fb678d49fa6111e9cf"],
-        })
-            .populate("user", "image username followers")
-            .sort("-createdAt");
+        // const posts = await Post.find({
+        //     user: [...user.following, user._id, "6313c3fb678d49fa6111e9cf"],
+        // })
+        //     .populate("user", "image username followers")
+        //     .sort("-createdAt");
+
+        // get following users poss and sort by date with comments model
+
+        const posts = await Post.aggregate([
+            {
+                $match: {
+                    user: {
+                        $in: [...user.following, user._id],
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "comments",
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            {
+                $project: {
+                    user: {
+                        _id: 1,
+                        username: 1,
+                        image: 1,
+                    },
+                    image: 1,
+                    caption: 1,
+                    location: 1,
+                    comments: {
+                        $size: "$comments",
+                    },
+                    likes: 1,
+                    createdAt: 1,
+                },
+            },
+            {
+                $unwind: "$user",
+            },
+            {
+                $sort: {
+                    createdAt: -1,
+                },
+            },
+        ]);
+
         return res.status(200).json(posts);
     } catch (err) {
+        console.log(err);
         return res.status(500).json({ msg: err.message });
     }
 };

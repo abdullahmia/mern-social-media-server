@@ -13,12 +13,6 @@ const postSchema = new Schema(
             },
         ],
         location: String,
-        comments: [
-            {
-                type: Types.ObjectId,
-                ref: "Comment",
-            },
-        ],
         user: {
             type: Types.ObjectId,
             ref: "User",
