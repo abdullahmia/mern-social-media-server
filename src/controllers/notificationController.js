@@ -5,10 +5,12 @@ module.exports.getAllNotifications = async (req, res) => {
         const user = req.user;
         const notifications = await Notification.find({
             recipient: user.id,
-        }).populate(
-            "sender",
-            "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
-        );
+        })
+            .populate(
+                "sender",
+                "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
+            )
+            .sort("-createdAt");
 
         // total unread notifications
         const unreadNotifications = await Notification.find({

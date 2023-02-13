@@ -39,14 +39,6 @@ module.exports.createPost = async (req, res) => {
 module.exports.getPosts = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id });
-        // const posts = await Post.find({
-        //     user: [...user.following, user._id, "6313c3fb678d49fa6111e9cf"],
-        // })
-        //     .populate("user", "image username followers")
-        //     .sort("-createdAt");
-
-        // get following users poss and sort by date with comments model
-
         const posts = await Post.aggregate([
             {
                 $match: {

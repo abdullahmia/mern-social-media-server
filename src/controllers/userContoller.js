@@ -127,7 +127,7 @@ module.exports.follow = async (req, res) => {
         );
 
         // create a notification
-        const notification = new Notification({
+        let notification = new Notification({
             sender: req.user.id,
             recipient: req.params.id,
             type: "follow",
@@ -135,11 +135,9 @@ module.exports.follow = async (req, res) => {
         });
         await notification.save();
 
-        console.log(
-            await notification.populate(
-                "recipient sender",
-                "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
-            )
+        notification = await notification.populate(
+            "recipient sender",
+            "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
         );
 
         // send notification to the user via socket.io
