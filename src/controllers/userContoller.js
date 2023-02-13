@@ -1,13 +1,17 @@
 const { User } = require("../models/user");
 const cloudinary = require("../lib/cloudinary");
 const Post = require("../models/post");
+const Notification = require("../models/notification");
 
 module.exports.getUser = async (req, res) => {
     try {
         let username = req.params.username;
         const user = await User.findOne({ username: username })
             .select("-password")
-            .populate("followers following", "-password");
+            .populate(
+                "followers following",
+                "-password -bio -createdAt -email -followers -following -gender -isDeactivate -isLock -phone -website -updatedAt"
+            );
         if (!user) {
             return res.status(404).json({
                 isUser: false,
@@ -121,6 +125,18 @@ module.exports.follow = async (req, res) => {
             },
             { new: true }
         );
+
+        // create a notification
+        const notification = new Notification({
+            sender: req.user.id,
+            receiver: req.params.id,
+            type: "follow",
+            link: `/${req.user.username}`,
+        });
+        await notification.save();
+
+        // send notification to the user via socket.io
+        global.io.emit("notification", notification);
 
         res.status(200).json({
             user: newUser,
