@@ -1,5 +1,5 @@
 const { genarateToken, verifyToken } = require("../lib/jwt");
-const { User, Token } = require("../models/user");
+const { User } = require("../models/user");
 const sendMail = require("../lib/mailer");
 const bcrypt = require("bcryptjs");
 
@@ -165,7 +165,6 @@ module.exports.setPassword = async (req, res) => {
                 const hash = await bcrypt.hash(confirmPassword, 10);
                 getUser.password = hash;
                 await getUser.save();
-                await Token.findOneAndDelete({ user: getUser._id });
                 return res.status(200).json({
                     message: "Password has been changed",
                 });

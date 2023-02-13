@@ -1,7 +1,7 @@
 const { User } = require("../models/user");
 const cloudinary = require("../lib/cloudinary");
 const Post = require("../models/post");
-const Notification = require("../models/notification");
+const Notification = require("../models/notificaiton");
 
 module.exports.getUser = async (req, res) => {
     try {
@@ -129,11 +129,18 @@ module.exports.follow = async (req, res) => {
         // create a notification
         const notification = new Notification({
             sender: req.user.id,
-            receiver: req.params.id,
+            recipient: req.params.id,
             type: "follow",
             link: `/${req.user.username}`,
         });
         await notification.save();
+
+        console.log(
+            await notification.populate(
+                "recipient sender",
+                "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
+            )
+        );
 
         // send notification to the user via socket.io
         global.io.emit("notification", notification);
@@ -143,6 +150,7 @@ module.exports.follow = async (req, res) => {
         });
         await follwoingUser.save();
     } catch (err) {
+        console.log(err);
         return res.status(500).json({ msg: err.message });
     }
 };
