@@ -5,6 +5,7 @@ const {
     getPosts,
     like,
     unlike,
+    getPost,
 } = require("../controllers/postController");
 const multer = require("../lib/multer");
 
@@ -14,6 +15,8 @@ router
     .route("/")
     .post([isLoggedIn, multer.single("image")], createPost)
     .get(isLoggedIn, getPosts);
+
+router.route("/:postId").get(isLoggedIn, getPost);
 
 router.patch("/like/:id", isLoggedIn, like);
 router.patch("/unlike/:id", isLoggedIn, unlike);

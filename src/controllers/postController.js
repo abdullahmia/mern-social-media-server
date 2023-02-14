@@ -2,6 +2,7 @@ const Post = require("../models/post");
 const { User } = require("../models/user");
 const cloudinary = require("../lib/cloudinary");
 const Notification = require("../models/notificaiton");
+const Comment = require("../models/comment");
 
 // create a post
 module.exports.createPost = async (req, res) => {
@@ -98,6 +99,32 @@ module.exports.getPosts = async (req, res) => {
     }
 };
 
+// get post
+module.exports.getPost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const post = await Post.findOne({ _id: postId })
+            .populate(
+                "user",
+                "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
+            )
+            .sort("-createdAt");
+
+        // get all comment of this post
+        const comments = await Comment.find({ post: post._id })
+            .populate(
+                "user",
+                "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
+            )
+            .sort("-createdAt");
+
+        return res.status(200).json({ post, comments });
+    } catch (err) {
+        return res.status(500).json({ msg: err.message });
+    }
+};
+
 // like a post
 module.exports.like = async (req, res) => {
     try {
@@ -132,7 +159,7 @@ module.exports.like = async (req, res) => {
             sender: req.user.id,
             recipient: post.user,
             type: "like",
-            link: `/p/${post._id}}`,
+            link: `/p/${post._id}`,
         });
         await notification.save();
 
