@@ -1,6 +1,7 @@
 const Post = require("../models/post");
 const { User } = require("../models/user");
 const cloudinary = require("../lib/cloudinary");
+const Notification = require("../models/notificaiton");
 
 // create a post
 module.exports.createPost = async (req, res) => {
@@ -100,7 +101,7 @@ module.exports.getPosts = async (req, res) => {
 // like a post
 module.exports.like = async (req, res) => {
     try {
-        const post = await Post.findOne({
+        let post = await Post.findOne({
             _id: req.params.id,
             likes: req.user.id,
         });
@@ -123,6 +124,25 @@ module.exports.like = async (req, res) => {
 
         if (!like)
             return res.status(404).json({ message: "Post does not exist" });
+
+        post = await Post.findOne({ _id: req.params.id });
+
+        // create a notification
+        let notification = new Notification({
+            sender: req.user.id,
+            recipient: post.user,
+            type: "like",
+            link: `/p/${post._id}}`,
+        });
+        await notification.save();
+
+        notification = await notification.populate(
+            "recipient sender",
+            "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
+        );
+
+        // send notification to user
+        global.io.emit("notification", notification);
 
         return res
             .status(200)
