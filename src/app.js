@@ -7,7 +7,11 @@ const morgan = require("morgan");
 const routes = require("./routes/index");
 
 // middlewares
-app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:3000",
+    })
+);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

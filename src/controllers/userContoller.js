@@ -184,3 +184,19 @@ module.exports.unfollow = async (req, res) => {
         return res.status(500).json({ msg: err.message });
     }
 };
+
+// get all followers
+module.exports.getFollowers = async (req, res) => {
+    try {
+        const user = req.user;
+
+        // get current user all followers and populate their information
+        const followers = await User.findOne({ _id: user.id })
+            .select("followers")
+            .populate("followers", "-password");
+
+        return res.status(200).json(followers.followers);
+    } catch (err) {
+        return res.status(500).json({ msg: err.message });
+    }
+};
