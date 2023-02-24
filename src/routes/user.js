@@ -6,6 +6,7 @@ const {
     follow,
     unfollow,
     getFollowers,
+    searchUser,
 } = require("../controllers/userContoller");
 const uploader = require("../lib/multer");
 const { isLoggedIn } = require("../middlewares/auth");
@@ -26,5 +27,8 @@ router.patch(
 router.patch("/follow/:id", isLoggedIn, follow);
 router.patch("/unfollow/:id", isLoggedIn, unfollow);
 router.route("/followers").get(isLoggedIn, getFollowers);
+
+// search user by username
+router.get("/search", isLoggedIn, searchUser);
 
 module.exports = router;

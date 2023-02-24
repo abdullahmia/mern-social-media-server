@@ -199,3 +199,17 @@ module.exports.getFollowers = async (req, res) => {
         return res.status(500).json({ msg: err.message });
     }
 };
+
+// search user by username
+module.exports.searchUser = async (req, res) => {
+    try {
+        // get username through query
+        const username = req.query.username;
+        const user = await User.find({
+            username: { $regex: username, $options: "i" },
+        }).select("-password");
+        return res.status(200).json(user);
+    } catch (err) {
+        return res.status(500).json({ msg: err.message });
+    }
+};
