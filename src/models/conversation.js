@@ -12,6 +12,13 @@ const conversationSchema = new Schema(
         lastMessage: {
             type: String,
         },
+        // seen
+        seen: [
+            {
+                type: Types.ObjectId,
+                ref: "User",
+            },
+        ],
     },
     { timestamps: true }
 );

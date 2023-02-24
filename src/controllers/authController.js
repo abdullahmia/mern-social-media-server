@@ -146,7 +146,6 @@ module.exports.forgotPasswordEmailSend = async (req, res) => {
             message: "Password reset email has been sent on your email.",
         });
     } catch (err) {
-        console.log(err);
         return res.status(500).json({ msg: err.message });
     }
 };

@@ -48,6 +48,9 @@ module.exports.addMessage = async (req, res) => {
 
         // update conversation last message
         conversation.lastMessage = text;
+        // remove seen from conversation
+        conversation.seen = [sender];
+
         await conversation.save();
 
         global.io.emit("newMessage", savedMessage);

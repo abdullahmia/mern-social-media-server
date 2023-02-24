@@ -9,6 +9,7 @@ module.exports.createConversation = async (req, res) => {
         const newConversation = new Conversation({
             participants: [user.id, receiverId],
             lastMessage: message,
+            seen: [user.id],
         });
 
         const savedConversation = await (
@@ -44,8 +45,30 @@ module.exports.getConversations = async (req, res) => {
             .populate("participants", "username profilePicture fullName image")
             .sort({ updatedAt: -1 });
 
-        console.log(conversations);
         return res.status(200).json(conversations);
+    } catch (err) {
+        return res.status(500).json(err.message);
+    }
+};
+
+// seen conversation
+module.exports.seenConversation = async (req, res) => {
+    try {
+        const conversationId = req.params.conversationId;
+        const user = req.user;
+
+        const conversation = await Conversation.findById(conversationId);
+
+        if (!conversation) {
+            return res.status(404).json("Conversation not found");
+        }
+
+        if (!conversation.seen.includes(user.id)) {
+            conversation.seen.push(user.id);
+            await conversation.save();
+        }
+
+        return res.status(200).json(conversation);
     } catch (err) {
         return res.status(500).json(err.message);
     }

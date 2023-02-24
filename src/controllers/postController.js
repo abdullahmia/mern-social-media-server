@@ -32,7 +32,6 @@ module.exports.createPost = async (req, res) => {
             });
         }
     } catch (err) {
-        console.log(err);
         return res.status(500).json({ msg: err.message });
     }
 };
@@ -94,7 +93,6 @@ module.exports.getPosts = async (req, res) => {
 
         return res.status(200).json(posts);
     } catch (err) {
-        console.log(err);
         return res.status(500).json({ msg: err.message });
     }
 };

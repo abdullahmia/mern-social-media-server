@@ -34,7 +34,6 @@ module.exports.addComment = async (req, res) => {
 
         return res.status(201).json(getComment);
     } catch (err) {
-        console.log(err);
         res.status(500).json({ error: err.message });
     }
 };
