@@ -48,9 +48,14 @@ const userSchema = new Schema(
             {
                 type: Types.ObjectId,
                 ref: "User",
+                default: ["63fa89238373968eaef1f321"],
             },
         ],
         isDeactivate: {
+            type: Boolean,
+            default: false,
+        },
+        isVerified: {
             type: Boolean,
             default: false,
         },
