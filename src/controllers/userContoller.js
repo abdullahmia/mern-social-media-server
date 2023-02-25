@@ -143,6 +143,8 @@ module.exports.follow = async (req, res) => {
         // send notification to the user via socket.io
         global.io.emit("notification", notification);
 
+        await follwoingUser.save();
+
         res.status(200).json({
             user: newUser,
         });
@@ -177,7 +179,7 @@ module.exports.unfollow = async (req, res) => {
         );
 
         res.status(200).json({
-            message: "User has been unfollowed",
+            user: newUser,
         });
     } catch (err) {
         return res.status(500).json({ msg: err.message });

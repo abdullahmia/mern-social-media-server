@@ -186,22 +186,24 @@ module.exports.like = async (req, res) => {
 
         post = await Post.findOne({ _id: req.params.id });
 
-        // create a notification
-        let notification = new Notification({
-            sender: req.user.id,
-            recipient: post.user,
-            type: "like",
-            link: `/p/${post._id}`,
-        });
-        await notification.save();
+        if (req.user.id !== post.user.toString()) {
+            // create a notification
+            let notification = new Notification({
+                sender: req.user.id,
+                recipient: post.user,
+                type: "like",
+                link: `/p/${post._id}`,
+            });
+            await notification.save();
 
-        notification = await notification.populate(
-            "recipient sender",
-            "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
-        );
+            notification = await notification.populate(
+                "recipient sender",
+                "-email -fullName -password -gender -followers -following -isDeactivate -isLock -website -bio -phone -createdAt -updatedAt -_v"
+            );
 
-        // send notification to user
-        global.io.emit("notification", notification);
+            // send notification to user
+            global.io.emit("notification", notification);
+        }
 
         return res
             .status(200)

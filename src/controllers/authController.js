@@ -41,6 +41,23 @@ module.exports.register = async (req, res) => {
     }
 };
 
+// is user exist
+module.exports.isExistUser = async (req, res) => {
+    try {
+        // get username from query
+        const { username } = req.query;
+
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(200).json({ isUser: false });
+        }
+
+        return res.status(200).json({ isUser: true });
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
+    }
+};
+
 // login
 module.exports.login = async (req, res) => {
     try {
