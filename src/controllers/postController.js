@@ -40,6 +40,7 @@ module.exports.createPost = async (req, res) => {
 module.exports.getPosts = async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user.id });
+
         const posts = await Post.aggregate([
             {
                 $match: {

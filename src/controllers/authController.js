@@ -22,13 +22,17 @@ module.exports.register = async (req, res) => {
 
         const hash = await bcrypt.hash(password, 10);
 
-        // create a new user
-        const user = await new User({
+        // create a new user with def following values
+        const user = new User({
             email,
             fullName,
             username,
             password: hash,
-        }).save();
+            following: ["63fa89238373968eaef1f321"],
+        });
+
+        // save user
+        await user.save();
 
         return res.send({
             message: "User has been created",
