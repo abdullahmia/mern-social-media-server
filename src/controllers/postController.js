@@ -117,7 +117,41 @@ module.exports.getPost = async (req, res) => {
             )
             .sort("-createdAt");
 
-        return res.status(200).json({ post, comments });
+        // get related post with comment count of post user except this post
+        const relatedPosts = await Post.aggregate([
+            {
+                $match: {
+                    user: post.user._id,
+                    _id: {
+                        $ne: post._id,
+                    },
+                },
+            },
+            {
+                $lookup: {
+                    from: "comments",
+                    localField: "_id",
+                    foreignField: "post",
+                    as: "comments",
+                },
+            },
+            {
+                $project: {
+                    user: 1,
+                    image: 1,
+                    caption: 1,
+                    location: 1,
+                    comments: {
+                        $size: "$comments",
+                    },
+                    likes: 1,
+                    createdAt: 1,
+                },
+            },
+            { $sort: { createdAt: -1 } },
+        ]);
+
+        return res.status(200).json({ post, comments, relatedPosts });
     } catch (err) {
         return res.status(500).json({ msg: err.message });
     }
