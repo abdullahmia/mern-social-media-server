@@ -9,7 +9,7 @@ const routes = require("./routes/index");
 // middlewares
 app.use(
     cors({
-        origin: "http://localhost:3000",
+        origin: ["http://localhost:3000", "https://mistragram.netlify.app"],
     })
 );
 app.use(morgan("dev"));
