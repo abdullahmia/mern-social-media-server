@@ -9,8 +9,10 @@ module.exports.register = async (req, res) => {
         const { email, fullName, username, password } = req.body;
 
         // check if user is already exist
-        const isEmailUser = await User.findOne({ email });
-        const isUsernameUser = await User.findOne({ username });
+        const isEmailUser = await User.findOne({ email: email.toLowerCase() });
+        const isUsernameUser = await User.findOne({
+            username: username.toLowerCase(),
+        });
         if (isEmailUser) {
             return res.status(400).json({ message: "User is alrady exist" });
         }
@@ -24,9 +26,9 @@ module.exports.register = async (req, res) => {
 
         // create a new user with def following values
         const user = new User({
-            email,
+            email: email.toLowerCase(),
             fullName,
-            username,
+            username: username.toLowerCase(),
             password: hash,
             following: ["63fa89238373968eaef1f321"],
         });
@@ -51,7 +53,7 @@ module.exports.isExistUser = async (req, res) => {
         // get username from query
         const { username } = req.query;
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username: username.toLowerCase() });
         if (!user) {
             return res.status(200).json({ isUser: false });
         }
@@ -66,7 +68,7 @@ module.exports.isExistUser = async (req, res) => {
 module.exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
-        let user = await User.findOne({ username });
+        let user = await User.findOne({ username: username.toLowerCase() });
         if (!user) {
             return res.status(404).json({ message: "account not found" });
         }
